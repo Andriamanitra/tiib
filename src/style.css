@@ -2,6 +2,8 @@
   --base-color: #2b888f;
   --border-color: rgba(255, 255, 255, 0.25);
   --background-color: #242424;
+  --editor-background-color: #141318;
+  --terminal-background-color: #0C0C0C;
   --text-color: whitesmoke;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.3;
@@ -92,20 +94,30 @@ ul {
   min-width: 70ch;
 }
 
+
 .stdout,
 .stderr {
   min-height: 1lh;
-  border: 1px solid black;
+  padding: 3px;
+  background-color: red;
   margin: 3px;
-  padding: 0 0.8ch;
+  max-width: fit-content;
+  overflow: hidden;
+
+  .xterm {
+    border: 5px solid var(--terminal-background-color);
+  }
+  .xterm-screen {
+    background-color: var(--terminal-background-color);
+  }
 }
 
 .stdout {
-  border-color: var(--base-color);
+  background-color: var(--base-color);
 }
 
 .stderr {
-  border-color: hsl(from var(--base-color) 0deg s l);
+  background-color: hsl(from var(--base-color) 0deg s l);
 }
 
 .hidden {
@@ -134,17 +146,20 @@ textarea {
   border-color: var(--border-color);
   border-width: 4px;
   max-width: 1350px;
+  background-color: var(--editor-background-color);
+}
+
+a:hover {
+  color: var(--base-color);
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     --text-color: #213547;
     --background-color: #ffffff;
+    --editor-background-color: #ffffff;
+    --terminal-background-color: #08005A;
     --border-color: rgba(0, 0, 0, 0.25);
-  }
-
-  a:hover {
-    color: var(--base-color);
   }
 
   button {

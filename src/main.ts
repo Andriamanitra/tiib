@@ -1,9 +1,27 @@
 import './style.css'
 import { run } from './lang-runner.ts'
+import { Terminal } from '@xterm/xterm';
+import '@xterm/xterm/css/xterm.css';
+
+function clamp(v: number, min: number, max: number): number {
+  return Math.max(Math.min(v, max), min);
+}
 
 function output(elem: HTMLElement, str: string) {
-  elem.innerText = str;
+  elem.innerHTML = "";
   elem.classList.toggle("hidden", str.length === 0);
+  if (str.length === 0) return;
+  const term = new Terminal({
+    convertEol: true,
+    disableStdin: true,
+    cursorBlink: false,
+    cursorStyle: 'block',
+    cursorInactiveStyle: 'none',
+  });
+  term.open(elem);
+  const lengths = str.split("\n").map(line => line.length);
+  term.resize(clamp(1 + Math.max(...lengths), 60, 100), lengths.length);
+  term.write(str);
 }
 
 const inputEl = document.getElementById("stdin") as HTMLTextAreaElement;
