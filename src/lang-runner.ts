@@ -1,5 +1,8 @@
 import { loadPyodide, type PyodideAPI } from 'pyodide';
 import { LuaFactory } from 'wasmoon';
+import { RubyVM } from '@ruby/wasm-wasi/dist/vm';
+import { WASI, File, OpenFile, ConsoleStdout } from "@bjorn3/browser_wasi_shim";
+import rubyWasmUrl from "@ruby/4.0-wasm-wasi/dist/ruby+stdlib.wasm?url";
 
 
 type RunParams = {
@@ -23,14 +26,12 @@ function lineReader(input: string) {
 }
 
 const PYTHON_FILENAME = "solution.py"
-let pyodide: PyodideAPI | null = null;
-
+const PYODIDE: Promise<PyodideAPI> = loadPyodide({ args: [PYTHON_FILENAME] });
 async function runPython(params: RunParams): Promise<RunResult> {
     const { code, args, input } = params;
     const stdoutOutput: string[] = [];
     const stderrOutput: string[] = [];
-    if (pyodide === null) pyodide = await loadPyodide({ args: [PYTHON_FILENAME] })
-    //const pyodide = await PYODIDE;
+    const pyodide = await PYODIDE;
     pyodide.setStdout({ batched: (output: string) => stdoutOutput.push(output) });
     pyodide.setStderr({ batched: (output: string) => stderrOutput.push(output) });
     pyodide.setStdin({ stdin: lineReader(input) });
@@ -43,7 +44,8 @@ async function runPython(params: RunParams): Promise<RunResult> {
                 pass`)
     let exitcode = -1;
     try {
-        pyodide.runPython(code, { filename: PYTHON_FILENAME, globals: pyodide.globals, locals: pyodide.globals });
+        const ret = pyodide.runPython(code, { filename: PYTHON_FILENAME, globals: pyodide.globals, locals: pyodide.globals });
+        console.log({ret});
         exitcode = 0;
     } catch (err) {
         stderrOutput.push(String(err));
@@ -56,8 +58,36 @@ async function runPython(params: RunParams): Promise<RunResult> {
     }
 }
 
-function runRuby(_params: RunParams): RunResult {
-    throw Error("not implemented yet");
+const RUBY_WASM_MODULE: Promise<WebAssembly.Module> = WebAssembly.compileStreaming(fetch(rubyWasmUrl));
+async function runRuby(params: RunParams): Promise<RunResult> {
+    const { code, args, input } = params;
+    const utf8 = new TextEncoder();
+    const stdoutOutput: string[] = [];
+    const stderrOutput: string[] = [];
+    const module = await RUBY_WASM_MODULE;
+    const stdin = new OpenFile(new File(utf8.encode(input)));
+    const stdout = ConsoleStdout.lineBuffered(msg => stdoutOutput.push(msg));
+    const stderr = ConsoleStdout.lineBuffered(msg => stderrOutput.push(msg));
+    const wasip1 = new WASI([], [], [stdin, stdout, stderr]);
+    const { vm } = await RubyVM.instantiateModule({ module, wasip1 });
+    vm.eval(`
+        $0 = "solution.rb"
+        ARGS = ${JSON.stringify(args)}
+    `);
+    let exitcode = -1;
+    try {
+        const ret = vm.eval(code);
+        console.log({ret});
+        exitcode = 0;
+    } catch (err) {
+        stderrOutput.push(String(err));
+        exitcode = 1;
+    }
+    return {
+        exitcode,
+        stdout: stdoutOutput.join("\n"),
+        stderr: stderrOutput.join("\n"),
+    }
 }
 
 async function runLua(params: RunParams): Promise<RunResult> {
@@ -90,7 +120,8 @@ async function runLua(params: RunParams): Promise<RunResult> {
         `)
     let exitcode = -1;
     try {
-        await lua.doFile("solution.lua");
+        const ret = await lua.doFile("solution.lua");
+        console.log({ret});
         exitcode = 0;
     } catch (err) {
         stderrOutput.push(String(err))
@@ -131,12 +162,13 @@ function runJs(params: RunParams): RunResult {
         iframe.style.display = "none";
         document.body.appendChild(iframe);
         try {
-            iframe.contentWindow?.window.Function("ARGS", "print", "eprint", "readline", src)(
+            const ret = iframe.contentWindow?.window.Function("ARGS", "print", "eprint", "readline", src)(
                 args,
                 outputTo(stdoutOutput),
                 outputTo(stderrOutput),
                 lineReader(input)
             );
+            console.log({ret});
         } finally {
             document.body.removeChild(iframe);
         }
@@ -163,7 +195,7 @@ export async function run(language: string | null, params: RunParams) {
         case "python":
             return await runPython(params);
         case "ruby":
-            return runRuby(params);
+            return await runRuby(params);
         case "lua":
             return runLua(params);
         default:

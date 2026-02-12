@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@bjorn3/browser_wasi_shim": "^0.4.2",
     "@ruby/4.0-wasm-wasi": "^2.8.1",
     "@ruby/wasm-wasi": "^2.8.1",
     "pyodide": "^0.29.3",

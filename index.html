@@ -63,7 +63,8 @@
       <summary>Ruby</summary>
       <section class="lang">
         <p>
-          Ruby is not implemented yet but it will use <a href="https://github.com/ruby/ruby.wasm">ruby.wasm</a>.
+          Ruby is executed in your browser using <a href="https://github.com/ruby/ruby.wasm">ruby.wasm</a> and <a href="https://github.com/bjorn3/browser_wasi_shim">browser_wasi_shim</a>.
+          For technical reasons CLI arguments are accessible through <code>ARGS</code> instead of the usual <code>ARGV</code>.
         </p>
         <textarea class="solution" data-lang="ruby"></textarea>
         <pre class="stdout hidden">stdout</pre>

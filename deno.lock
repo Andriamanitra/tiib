@@ -1,6 +1,7 @@
 {
   "version": "5",
   "specifiers": {
+    "npm:@bjorn3/browser_wasi_shim@~0.4.2": "0.4.2",
     "npm:@ruby/4.0-wasm-wasi@^2.8.1": "2.8.1",
     "npm:@ruby/wasm-wasi@^2.8.1": "2.8.1",
     "npm:pyodide@~0.29.3": "0.29.3",
@@ -12,6 +13,9 @@
   "npm": {
     "@bjorn3/browser_wasi_shim@0.3.0": {
       "integrity": "sha512-FlRBYttPRLcWORzBe6g8nmYTafBkOEFeOqMYM4tAHJzFsQy4+xJA94z85a9BCs8S+Uzfh9LrkpII7DXr2iUVFg=="
+    },
+    "@bjorn3/browser_wasi_shim@0.4.2": {
+      "integrity": "sha512-/iHkCVUG3VbcbmEHn5iIUpIrh7a7WPiwZ3sHy4HZKZzBdSadwdddYDZAII2zBvQYV0Lfi8naZngPCN7WPHI/hA=="
     },
     "@esbuild/aix-ppc64@0.27.3": {
       "integrity": "sha512-9fJMTNFTWZMh5qwrBItuziu834eOCUcEqymSH7pY+zoMVEZg3gcPuBNxH1EvfVYe9h0x/Ptw8KBzv7qxb7l8dg==",
@@ -277,7 +281,7 @@
     "@ruby/wasm-wasi@2.8.1": {
       "integrity": "sha512-xtisFn9V2U45nE2goni9UAd8LERHAzwFEsQk3+mG6+hXf4imYfDRRXnBqX6jERR0rysCH15IDzEkxjMQmIZ3qA==",
       "dependencies": [
-        "@bjorn3/browser_wasi_shim",
+        "@bjorn3/browser_wasi_shim@0.3.0",
         "tslib"
       ]
     },
@@ -535,6 +539,7 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@bjorn3/browser_wasi_shim@~0.4.2",
         "npm:@ruby/4.0-wasm-wasi@^2.8.1",
         "npm:@ruby/wasm-wasi@^2.8.1",
         "npm:pyodide@~0.29.3",

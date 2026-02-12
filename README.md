@@ -12,7 +12,7 @@ using js and wasm:
 * js is eval'd in an iframe to get a fresh namespace
 * lua uses [wasmoon](https://github.com/ceifa/wasmoon)
 * python uses [pyodide](https://pyodide.org/)
-* ruby will use [ruby.wasm](https://github.com/ruby/ruby.wasm)
+* ruby uses [ruby.wasm](https://github.com/ruby/ruby.wasm) with [@bjorn3/browser_wasi_shim](https://github.com/bjorn3/browser_wasi_shim)
 
 you can try it out:
 
