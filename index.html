@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="module" src="/src/main.ts" defer></script>
+  <title>tiib</title>
+</head>
+
+<body>
+  <h1>tiib - try it in browser</h1>
+  <div class="details-tabs">
+    <details name="lang" open>
+      <summary>Javascript</summary>
+      <section class="lang">
+        <p>
+          Javascript is executed in your browser which means you don't have access to node.js (or deno or bun)
+          APIs. To compensate for the lack of features the following are made available in the environment:
+        </p>
+        <ul>
+          <li><code>print()</code> function to print to stdout
+          <li><code>eprint()</code> function to debug print to stderr
+          <li><code>readline()</code> function to read from stdin
+          <li><code>ARGS</code> for accessing the command-line arguments
+        </ul>
+        <textarea class="solution" data-lang="js">print(readline(), ARGS)</textarea>
+        <pre class="stdout hidden">stdout</pre>
+        <pre class="stderr hidden">stderr</pre>
+      </section>
+    </details>
+    <details name="lang">
+      <summary>Lua</summary>
+      <section class="lang">
+        <p>
+          Lua is executed in your browser using <a href="https://github.com/ceifa/wasmoon">wasmoon</a>. The environment
+          includes:
+        </p>
+        <ul>
+          <li><code>print()</code> function to print to stdout
+          <li><code>eprint()</code> function to debug print to stderr
+          <li><code>arg</code> for accessing the command-line arguments
+        </ul>
+        <textarea class="solution" data-lang="lua"></textarea>
+        <pre class="stdout hidden">stdout</pre>
+        <pre class="stderr hidden">stderr</pre>
+      </section>
+    </details>
+    <details name="lang">
+      <summary>Python</summary>
+      <section class="lang">
+        <p>
+          Python is executed in your browser using <a href="https://pyodide.org/">Pyodide</a>. Note that the runtime may
+          take a few seconds to load the first time you run Python!
+        </p>
+        <textarea class="solution" data-lang="python"></textarea>
+        <pre class="stdout hidden">stdout</pre>
+        <pre class="stderr hidden">stderr</pre>
+      </section>
+    </details>
+    <details name="lang">
+      <summary>Ruby</summary>
+      <section class="lang">
+        <p>
+          Ruby is not implemented yet but it will use <a href="https://github.com/ruby/ruby.wasm">ruby.wasm</a>.
+        </p>
+        <textarea class="solution" data-lang="ruby"></textarea>
+        <pre class="stdout hidden">stdout</pre>
+        <pre class="stderr hidden">stderr</pre>
+      </section>
+    </details>
+  </div>
+  <section>
+    <h2>Inputs</h2>
+    <fieldset>
+      <legend>stdin</legend>
+      <textarea name="stdin" id="stdin">42 67</textarea>
+    </fieldset>
+    <fieldset id="cli-args">
+      <legend>command-line-arguments</legend>
+      <button id="rm-arg">-1</button>
+      <button id="add-arg">+1</button>
+      <input type="text" name="arg1" id="arg1" value="arg1">
+      <input type="text" name="arg2" id="arg2" value="arg2">
+      <input type="text" name="arg3" id="arg3" value="arg3">
+    </fieldset>
+  </section>
+</body>
+
+</html>
