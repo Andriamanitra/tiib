@@ -1,7 +1,8 @@
-import './style.css'
-import { run } from './lang-runner.ts'
+import './style.css';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
+import type { RunParams, RunResult } from './exec.ts';
+import { executors } from './exec.ts';
 
 function clamp(v: number, min: number, max: number): number {
   return Math.max(Math.min(v, max), min);
@@ -24,28 +25,47 @@ function output(elem: HTMLElement, str: string) {
   term.write(str);
 }
 
+function getArgs(): string[] {
+  const argElements = [...document.querySelectorAll("#cli-args input[type=text]")] as HTMLInputElement[];
+  return argElements.map(el => el.value);
+}
+
 const inputEl = document.getElementById("stdin") as HTMLTextAreaElement;
+
+function initLanguage(language: string, solutionEl: HTMLTextAreaElement, stdoutEl: HTMLElement, stderrEl: HTMLElement) {
+  solutionEl.addEventListener("input", async () => {
+    const request: RunParams = {
+      language,
+      code: solutionEl.value,
+      args: getArgs(),
+      input: inputEl.value,
+    };
+    executors[language].execute(request)
+      .then((result: RunResult) => {
+        solutionEl.classList.toggle("error", result.exitcode !== 0);
+        output(stdoutEl, result.stdout);
+        output(stderrEl, result.stderr);
+      })
+      .catch((err: Error) => {
+        solutionEl.classList.add("error");
+        output(stdoutEl, "");
+        output(stderrEl, err.message);
+      });
+  })
+}
 
 for (const section of document.getElementsByClassName("lang")) {
   const solutionEl = section.querySelector("textarea") as HTMLTextAreaElement;
   const stdoutEl = section.querySelector(".stdout") as HTMLElement;
   const stderrEl = section.querySelector(".stderr") as HTMLElement;
-  const lang = solutionEl.getAttribute("data-lang");
-  solutionEl.addEventListener("input", async () => {
-    const argElements = [...document.querySelectorAll("#cli-args input[type=text]")] as HTMLInputElement[];
-    const args = argElements.map((el: HTMLInputElement) => el.value);
-    const input = inputEl.value;
-    const result = await run(lang, { code: solutionEl.value, args, input });
-    console.log(result)
-    if (result.exitcode !== 0) {
-      solutionEl.classList.add("error");
-    } else {
-      solutionEl.classList.remove("error");
-    }
-    output(stdoutEl, result.stdout);
-    output(stderrEl, result.stderr);
-  })
+  const language = solutionEl.getAttribute("data-lang");
+  if (typeof language === "string") {
+    initLanguage(language, solutionEl, stdoutEl, stderrEl);
+  } else {
+    console.error("solution element missing data-lang attribute", solutionEl);
+  }
 }
+
 const rmArgButton = document.getElementById("rm-arg") as HTMLButtonElement;
 rmArgButton.addEventListener("click", () => {
   const argElements = [...document.querySelectorAll("#cli-args input[type=text]")];
