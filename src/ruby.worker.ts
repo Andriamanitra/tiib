@@ -18,7 +18,7 @@ async function runRuby(params: RunParams): Promise<RunResult> {
   const { vm } = await RubyVM.instantiateModule({ module, wasip1 });
   vm.eval(`
         $0 = "solution.rb"
-        ARGS = ${JSON.stringify(args)}
+        ARGV.replace(${JSON.stringify(args)})
     `);
   let exitcode = -1;
   try {
